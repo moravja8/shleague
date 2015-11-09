@@ -1,0 +1,1 @@
+/var/www/html/sh-league/app/views/games/index.blade.php

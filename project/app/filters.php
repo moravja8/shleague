@@ -27,7 +27,7 @@ App::after(function($request, $response)
 | Authentication Filters
 |--------------------------------------------------------------------------
 |
-| The following filters are used to verify that the user of the current
+| The following filters are used to verify that the users of the current
 | session is logged into this application. The "basic" filter easily
 | integrates HTTP Basic authentication for quick, simple checking.
 |
@@ -60,7 +60,7 @@ Route::filter('auth.basic', function()
 |--------------------------------------------------------------------------
 |
 | The "guest" filter is the counterpart of the authentication filters as
-| it simply checks that the current user is not logged in. A redirect
+| it simply checks that the current users is not logged in. A redirect
 | response will be issued if they are, which you may freely change.
 |
 */
@@ -76,15 +76,25 @@ Route::filter('guest', function()
 |--------------------------------------------------------------------------
 |
 | The CSRF filter is responsible for protecting your application against
-| cross-site request forgery attacks. If this special token in a user
+| cross-site request forgery attacks. If this special token in a users
 | session does not match the one given in this request, we'll bail.
 |
 */
 
 Route::filter('csrf', function()
 {
-	if (Session::token() != Input::get('_token'))
+	if (Session::token() !== Input::get('_token'))
 	{
 		throw new Illuminate\Session\TokenMismatchException;
 	}
+});
+
+Route::filter('captain', function()
+{
+    $id = Request::segment(2); // use the key you defined
+    $captain_id = DB::table('teams')->where('teams.id', $id)->join('team_members', 'teams.id', '=', 'team_id')->first()->user_id;
+    if (Auth::user()->id != $captain_id)
+    {
+        return Redirect::route('only_captain');
+    }
 });
